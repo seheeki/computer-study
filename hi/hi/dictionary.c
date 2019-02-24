@@ -123,47 +123,47 @@ int translate(char *word)
 
 int translate_memory(char *word)
 {
-	struct dic st_dic;
-    int init_value = 4;
-	FILE *fp;
-	char ch;
-	int count = 0;
-	char *p_start = 0;
-	char *p_end = 0;
-	int b_find = 0;
-	int result = 0;
-	int file_size = 0;
-	char *p_all_words = NULL;
-	char *p_current = NULL;
+	struct dic st_dic;  //dic 구조체
+    int init_value = 4; // 초기 alloc 에 4바이트 할당할때 사용함 나중에 realloc으로 동적으로 할당됨 
+	FILE *fp; // 사전 파일포인터
+	char ch; // ch 변수 사전 메모리에서 한글자씩 읽어올때 사용
+	int count = 0; // 단어수 세기
+	char *p_start = 0; // 단어의 시작 포인터
+	char *p_end = 0; // 단어의 마지막 포인터
+	int b_find = 0; // 단어를 찾았는지에 대한 플래그
+	int result = 0; // 결과 0은 못찾은거
+	int file_size = 0; // 파일크기
+	char *p_all_words = NULL; //모든 단어
+	char *p_current = NULL; //메모리의 현채 위치 포인터
 
-	fp = fopen("dictionary.dat", "r");
-	file_size = get_file_size(fp);
+	fp = fopen("dictionary.dat", "r"); // 사전파일 읽는다.
+	file_size = get_file_size(fp); // 파일크기를 얻는다.
 //	printf("file size = %d\n", file_size);
 
-	p_all_words = (char *)malloc(sizeof(char) * (file_size+1));
-	memset(p_all_words, 0, (file_size+1)*sizeof(char));
-	fseek(fp, 0, SEEK_SET);
-	fread(p_all_words, file_size, 1, fp);
-	fclose(fp);
+	p_all_words = (char *)malloc(sizeof(char) * (file_size+1)); // p_all_words에 파일 사이즈만큼 메모리를 할당한다.
+	memset(p_all_words, 0, (file_size+1)*sizeof(char)); // p_all_words 메모리에 0을 채운다.
+	fseek(fp, 0, SEEK_SET); // 파일 포인터를 처음으로 지정한다. 
+	fread(p_all_words, file_size, 1, fp); // fp에서 file_size만큼 읽어서 p_all_words메모리에 저장한다.
+	fclose(fp); //파일닫음
 //	printf("all words : %s\n", p_all_words);
 
-	st_dic.hanguel = (char *)malloc(sizeof(char) * init_value);
+	st_dic.hanguel = (char *)malloc(sizeof(char) * init_value); //초기메모리할당
 	st_dic.english = (char *)malloc(sizeof(char) * init_value);
 
-	memset(st_dic.hanguel, 0, init_value*sizeof(char));
+	memset(st_dic.hanguel, 0, init_value*sizeof(char)); //init_value*sizeof(char)를 0으로 채운다.
 	memset(st_dic.english, 0, init_value*sizeof(char));
 	
-	//메모리의 맨처음 위치를 얻는다.
-	p_current = p_all_words;
-    p_start = p_current;
+	
+	p_current = p_all_words; //메모리의 현재 위치를 얻는다.
+    p_start = p_current; //메모리의 맨처음 위치를 얻는다.
 //	printf("p_start : %p\n", p_start);
 	
 	//메모리를 1바이트씩 읽는다. 메모리 포인터는 1바이트씩 증가시킨다.
 	while ( (ch = *p_current) != 0)
 	{	
 		//읽은 바이트 크기를 하나 증가한다.
-		p_current++;
-		count++;
+		p_current++; // 포인터의 위치 증가
+		count++; // 단어의 증가
 		//,나 \n를 만나면 단어 읽기를 시도한다.
 		if( ch == ',' || ch == '\n')
 		{
@@ -217,6 +217,12 @@ int translate_memory(char *word)
 			{
 				printf("%s,%s\n", st_dic.hanguel, st_dic.english);
 				//단어가 일치할 경우 b_find를 1로 저장한다.			
+				b_find = 1;
+				break;
+			}
+			else if(strncmp(st_dic.english, word, strlen(word)) == 0)
+			{
+				printf("%s,%s\n", st_dic.english, st_dic.hanguel);
 				b_find = 1;
 				break;
 			}
