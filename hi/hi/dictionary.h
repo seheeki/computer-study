@@ -10,5 +10,7 @@ struct dic
 };
 int make_dictionary(void);
 int translate(char *word);
+int get_file_size(FILE *fp);
+int translate_memory(char *word);
 
 #endif

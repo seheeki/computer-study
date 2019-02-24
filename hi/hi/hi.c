@@ -17,7 +17,8 @@ int main()
 		{
 			break;
 		}
-	    translate(word);
+	    //translate(word);
+		translate_memory(word);
 	}
 
 
