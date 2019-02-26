@@ -10,13 +10,13 @@ int make_dictionary(void)
 	FILE *fp;
 	fp = fopen("dictionary.dat", "w");
 
-	fputs("개,dog\n고양이,cat\n효자초등학교,Hyojachodeonghakkyo\n", fp);
+	fputs("개/dog; 동물 갯과의 포유류. 가축으로 사람을 잘 따르고 영리하다. 일반적으로 늑대 따위와 비슷하게 생겼으며 날카로운 이빨이 있다. 냄새를 잘 맡으며 귀가 밝아 사냥이나 군용, 맹인 선도와 마약 및 폭약 탐지에 쓰인다. 전 세계에 걸쳐 모양, 크기, 색깔이 다양한 300여 품종이 있다.\n고양이/cat; 동물  고양잇과의 하나. 원래 아프리카의 리비아살쾡이를 길들인 것으로, 턱과 송곳니가 특히 발달해서 육식을 주로 한다. 발톱은 자유롭게 감추거나 드러낼 수 있으며, 눈은 어두운 곳에서도 잘 볼 수 있다. 애완동물로도 육종하여 여러 품종이 있다.\n효자초등학교/Hyojachodeonghakkyo; 성복동에 위치하는 초등학교\n", fp);
 
 	fclose(fp);
 	return 0;
 }
 
-int translate(char *word)
+/*int translate(char *word)
 {
 	struct dic st_dic;
     int init_value = 4;
@@ -72,7 +72,7 @@ int translate(char *word)
 
 			//구분자 1바이트를 읽어서 파일 포인터를 1바이트 전진한다 
 			ch = fgetc(fp);
-/*
+
 			if( ch == ',')
 			{
 				printf("한글 : %s\n", st_dic.hanguel);
@@ -81,17 +81,17 @@ int translate(char *word)
 			{
 				printf("영어 : %s\n", st_dic.english);
 			}
-*/
+
 			//단어 크기측정 변수인 count를 초기화한다.
 			count = 0;
 			//파일포인터의 단어 시작점을 저장한다.
 			fgetpos(fp, &start_fp);
 		}
-/*		else
+		else
 		{
 		    printf("%c", ch);
 		}
-*/
+
 
 		//단어 구분자가 개행문자일 경우 영어단어이다. 한글과 영어를 모두 읽은 상태이다.
 		if(ch == '\n')
@@ -119,7 +119,7 @@ int translate(char *word)
 	printf("사전 끝\n");
 
 	return result;
-}
+} */
 
 int translate_memory(char *word)
 {
@@ -135,6 +135,9 @@ int translate_memory(char *word)
 	int file_size = 0; // 파일크기
 	char *p_all_words = NULL; //모든 단어
 	char *p_current = NULL; //메모리의 현채 위치 포인터
+	char sep_hanguel = '/';
+	char sep_english = ';';
+	char sep_meaning = '\n';
 
 	fp = fopen("dictionary.dat", "r"); // 사전파일 읽는다.
 	file_size = get_file_size(fp); // 파일크기를 얻는다.
@@ -149,6 +152,7 @@ int translate_memory(char *word)
 
 	st_dic.hanguel = (char *)malloc(sizeof(char) * init_value); //초기메모리할당
 	st_dic.english = (char *)malloc(sizeof(char) * init_value);
+	st_dic.meaning = (char *)malloc(sizeof(char) * init_value);
 
 	memset(st_dic.hanguel, 0, init_value*sizeof(char)); //init_value*sizeof(char)를 0으로 채운다.
 	memset(st_dic.english, 0, init_value*sizeof(char));
@@ -164,8 +168,8 @@ int translate_memory(char *word)
 		//읽은 바이트 크기를 하나 증가한다.
 		p_current++; // 포인터의 위치 증가
 		count++; // 단어의 증가
-		//,나 \n를 만나면 단어 읽기를 시도한다.
-		if( ch == ',' || ch == '\n')
+		// /, ;, \n를 만나면 단어 읽기를 시도한다.
+		if( ch == sep_hanguel || ch == sep_english  || ch == sep_meaning)
 		{
 			
 			//단어의 끝의 메모리 포인터 위치를 얻는다.
@@ -177,7 +181,7 @@ int translate_memory(char *word)
 			p_current = p_start;
 
 			//한글 단어인 경우
-			if( ch == ',')
+			if( ch == sep_hanguel)
 			{
 				//메모리 크기를 변경하여 다시 메모리를 할당한다. count+1은 NULL을 위한 것.
 				st_dic.hanguel = (char *)realloc(st_dic.hanguel, sizeof(char) * (count+1));
@@ -188,13 +192,20 @@ int translate_memory(char *word)
 				memcpy( st_dic.hanguel, p_current, count*sizeof(char)); 
 //				printf("count : %d, ch: %c, st_dic.hanguel: %s\n", count, ch, st_dic.hanguel);
 			}
-			else
+			else if(ch == sep_english)
 			{
 				st_dic.english = (char *)realloc(st_dic.english, sizeof(char) * (count+1));
 				memset(st_dic.english, 0, (count+1)*sizeof(char));
 				memcpy( st_dic.english, p_current, count*sizeof(char)); 
 //				printf("st_dic.english: %s\n", st_dic.english);
 			}
+			else if(ch == sep_meaning)
+			{
+				st_dic.meaning = (char *)realloc(st_dic.meaning, sizeof(char) * (count+1));
+				memset(st_dic.meaning, 0, (count+1)*sizeof(char));
+				memcpy( st_dic.meaning, p_current, count*sizeof(char)); 
+			}
+
 
 			//복사한 단어 바이트 만큼 메모리 포인터를 전진한다.
 			p_current += count*sizeof(char);
@@ -210,23 +221,25 @@ int translate_memory(char *word)
 
 
 		//단어 구분자가 개행문자일 경우 영어단어이다. 한글과 영어를 모두 읽은 상태이다.
-		if(ch == '\n')
+		if(ch == sep_meaning)
 		{
 			//입력된 한글단어와 저장된 한글단어를 비교한다.
 			if(strncmp(st_dic.hanguel, word, strlen(word)) == 0)
 			{
-				printf("%s,%s\n", st_dic.hanguel, st_dic.english);
+				printf("%s,%s;%s\n", st_dic.hanguel, st_dic.english, st_dic.meaning);
 				//단어가 일치할 경우 b_find를 1로 저장한다.			
 				b_find = 1;
 				break;
 			}
 			else if(strncmp(st_dic.english, word, strlen(word)) == 0)
 			{
-				printf("%s,%s\n", st_dic.english, st_dic.hanguel);
+				printf("%s,%s;%s\n", st_dic.english, st_dic.hanguel, st_dic.meaning);
 				b_find = 1;
 				break;
 			}
+			
 		} 
+
 	}
 
 	//while문 끝까지 실행하여 단어를 못 찾을 경우 화면에 표시한다.
@@ -238,6 +251,7 @@ int translate_memory(char *word)
 
 	free(st_dic.english);
 	free(st_dic.hanguel);
+	free(st_dic.meaning);
 	printf("사전 끝\n");
 
 	return result;
@@ -253,3 +267,4 @@ int get_file_size(FILE *fp)
 
 	return size;
 }
+

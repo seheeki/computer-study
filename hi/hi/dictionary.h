@@ -7,6 +7,7 @@ struct dic
 {
 	char *hanguel;
 	char *english;
+	char *meaning;
 };
 int make_dictionary(void);
 int translate(char *word);

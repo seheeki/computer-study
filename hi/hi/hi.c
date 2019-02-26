@@ -13,7 +13,7 @@ int main()
 		memset(word, 0, 100*sizeof(char));
 		scanf("%s", word);
 		fflush(stdin); 
-		if(strncmp("³¡", word, strlen(word)) == 0)
+		if((strncmp("³¡", word, strlen(word)) == 0 ) || (strncmp("end", word, strlen(word)) == 0 ))
 		{
 			break;
 		}
