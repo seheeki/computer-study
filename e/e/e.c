@@ -52,16 +52,16 @@ int BSearchRecur(char ar[], int first, int last, char target)
 			if(ar[mid]>target)
 			{
 				last = mid -1;
-				BSearchRecur(ar, first, last, target);
+				return BSearchRecur(ar, first, last, target);
 			}
 			else
 			{
 				first = mid +1;
-				BSearchRecur(ar, first, last, target);
+				return BSearchRecur(ar, first, last, target);
 			}
 		}
 	}
-	else if(first>=last)
+	else if(first>last)
 	{
 		return -1;
 	}
