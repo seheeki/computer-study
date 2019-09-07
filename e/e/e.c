@@ -72,7 +72,7 @@ int BSearchRecur(char ar[], int first, int last, char target)
 
 int main(int arc, char** argv)
 {
-    char arr[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
+    char arr[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
     int idx = 0;
 	char inputAlphabet = 0;
  
